@@ -1,5 +1,7 @@
 #Controller
 
+Example movement code:
+
             # Keep trying different directions until it's a valid direction.
             valid_movement = False
             while not valid_movement:
