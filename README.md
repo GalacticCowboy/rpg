@@ -3,7 +3,7 @@ HOW TO GET THIS GREEN LIT ON STEAM
 
  
 
-Controller: 
+# Controller: 
 
 HP 
 
@@ -14,11 +14,11 @@ Attraction Level
 
  
 
-Player: 
+# Player: 
 
  
 
-Enemy: 
+# Enemy: 
 
 Golbin 
 
@@ -28,33 +28,33 @@ Space Marshal
 
  
 
-NPCs: 
+# NPCs: 
 
  
 
  
 
-Races: 
+# Races: 
 
  
 
-Items: 
+# Items: 
 
  
 
-Obstacles:  
+# Obstacles:  
 
  
 
-Power Ups/Pick ups: 
+# Power Ups/Pick ups: 
 
  
 
-Story 
+# Story 
 
-Objective 
+# Objective 
 
-Save parents from bad guys 
+  Save parents from bad guys 
 
  
 
