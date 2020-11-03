@@ -1,5 +1,34 @@
 #Controller
 
+            # Keep trying different directions until it's a valid direction.
+            valid_movement = False
+            while not valid_movement:
+                old_ngx = self.ng_x
+                old_ngy = self.ng_y
+                if self.direction == "right":
+                    self.ng_x += 1
+                if self.direction == "left":
+                    self.ng_x -= 1
+                if self.direction == "up":
+                    self.ng_y += 1
+                if self.direction == "down":
+                    self.ng_y -= 1
+
+                if 0 < self.ng_x < BR_X and 0 < self.ng_y < BR_Y - 1:
+                    valid_movement = True
+
+                if not valid_movement:
+                    self.ng_x = old_ngx
+                    self.ng_y = old_ngy
+                    self.change_direction()
+
+            # If it's a valid movement set it to a floor block.
+            if valid_movement:
+                self.blocks[self.ng_x][self.ng_y] = False
+                if random.randint(0, 3) == 2:
+                    # Every once and while randomly change direction to prevent straight lines from forming.
+                    self.change_direction()
+
 #Player
 
 #NPC
