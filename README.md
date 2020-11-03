@@ -1,7 +1,7 @@
 # rpg
 HOW TO GET THIS GREEN LIT ON STEAM 
 
- 
+** - Find documentations
 
 # Controller: 
 
@@ -9,12 +9,12 @@ HP
  int value
 
 Hit detection 
- grid-based location stuff
+ grid-based location stuff **
 
 Attraction Level 
  float value
  
-Movement
+Movement **
 
 Inventory
  nested dictionary
@@ -26,7 +26,7 @@ Race
 Current Power Ups
  bool/string
 
-Location
+Location **
  array
  size
   array[locations]
