@@ -22,7 +22,7 @@ class Controller:
         self.skills = []                    # list of ints i.e. [1,2,6,3] cooresponding to speed, strength, perceptions, etc
 
 
-    def update_position(self):
+    def update_position(self):                      #Roberto
         """
         Pretty straight forward
         """
@@ -44,7 +44,7 @@ class Controller:
         """
         pass
 
-    def set_velocity(self):
+    def set_velocity(self):                     #Roberto
         '''
         Takes the input (from wherever it comes) and uses it to set the velocity 
         of the sprite, and probably multiplies it by the speed of the thing.
@@ -84,7 +84,7 @@ class Player(Controller):
         self.standing = []      # An array of int that express how much everyone likes them
         self.progression = {}   # A dictionary with story points as keys and bollean values
 
-    def get_input(self):
+    def get_input(self):                        #Roberto
         """
         Ideally, the controller class has all the logical functions that 
         actually do stuff, and this one just calls the right ones at the 
@@ -92,7 +92,7 @@ class Player(Controller):
         """
         pass
 
-    def show_UI(self):
+    def show_UI(self):                          #Miseal
         """
         I honestly don't really know how to do this one.
         """
@@ -157,7 +157,7 @@ class NPC(Controller):
         # self.dialog = lines[Player.get_progression()]        or something like that
         self.quest = quest                                  # quests can also just have some Null value if they don't have a quest to give
 
-    def show_trade_window(self, inventory):
+    def show_trade_window(self, inventory):                 #Misael
         """
         Shows a UI thing that lets you buy stuff. Probably would iterate through 
         the two inventories and put them in some fancy table thing.
