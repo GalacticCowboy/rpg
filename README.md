@@ -3,142 +3,30 @@ HOW TO GET THIS GREEN LIT ON STEAM
 
 ** - Find documentations
 
-# Controller: 
+## Finish Character Animations
 
-HP 
- int value
+## Import Tiled Maps
 
-Hit detection 
- grid-based location stuff **
+## Hit Detection
 
-Attraction Level 
- float value
- 
-Movement **
+# How do walls Work?
 
-Inventory
- nested dictionary
- Equipped Item
- 
-Race
- subclass/tuple
- 
-Current Power Ups
- bool/string
+# Put Walls in
 
-Location **
- array
- size
-  array[locations]
- 
-Affiliation
- 
-Visibility
- int value
+## Put Enemies in
 
-Perception
- int value
- 
-Skills/Attributes
- Speed
- Strength
- Dexterity
- Luck (?)
- Charisma (?)
- Defense
- 
- 
- 
-# Player: 
- Input
-  Inventory stuff
-  Attacking
-  Moving
-  Interacting 
- 
- Story Progression (?)
- 
- 
+# UI
 
-# Enemy: 
- Awareness
-  Sneak-ing
-  
- Bravery (?)
-  Halo-esque Grunt thing
-  
- Navigation
-  Avoid walls/obstacles
-  
- Use_Weapon Method
- 
- 
- 
+# Basic Story
 
-# NPCs: 
+# World Creation
 
- Dialoge Stuff
-  dictionary
-  
- Quests
-  dictionary
-  
- Storefront UI
-  New Page
-  
- 
-# Destructables
- Walls
- 
- Crates
- 
- Enemies (?)
+# Weapons
 
-# Races: 
- Attributes/Perks
- 
-# Class:
- Atrributes/Perks
- 
+# Music
 
-# Items: 
- Weapons
-  Weapons
-  Accuracy
-  
- Pick-Ups
- 
- Progressional-Items
-  keys
-    
- 
+# Fun
 
-# Obstacles:  
- Walls
- 
- Water
- 
- Door
-  key
-  
- Spikes
- 
- 
- 
-
-# Power Ups/Pick ups: 
- Location
- 
- Adjuster
-  setter-methods
- 
-
-# Story 
-
-# Objective 
-
-  Save parents from bad guys 
-
- 
+# Sleep
 
  
