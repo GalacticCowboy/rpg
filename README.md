@@ -3,17 +3,17 @@ HOW TO GET THIS GREEN LIT ON STEAM
 
 ** - Find documentations
 
-## Finish Character Animations
+# Finish Character Animations   *
 
-## Import Tiled Maps
+# Import Tiled Maps   *
 
-## Hit Detection
+# Hit Detection   *
 
 # How do walls Work?
 
 # Put Walls in
 
-## Put Enemies in
+# Put Enemies in   *
 
 # UI
 
