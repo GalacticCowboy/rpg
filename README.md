@@ -11,6 +11,10 @@ HOW TO GET THIS GREEN LIT ON STEAM
 
 ## Roberto ==> 
 
+## Everyone ==> Learn Tiled and GitHub 
+
+
+
 # Finish Character Animations   *
 
 # Import Tiled Maps   *
