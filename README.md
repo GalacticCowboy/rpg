@@ -9,7 +9,7 @@ HOW TO GET THIS GREEN LIT ON STEAM
 
 ## Austin ==> Enemy stats/decisions (inventory and movement)
 
-## Roberto ==> 
+## Roberto ==> Changing Screens, when hitting a certain position.
 
 ## Everyone ==> Learn Tiled and GitHub 
 
