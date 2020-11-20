@@ -5,7 +5,7 @@ HOW TO GET THIS GREEN LIT ON STEAM
 
 ## Misael ==> Tiled Maps (will post maps when done)
 
-## Zack ==> Main Game loop/file 
+## Zack ==> Projectile logic and animation
 
 ## Austin ==> Enemy stats/decisions (inventory and movement)
 
