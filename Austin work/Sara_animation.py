@@ -6,8 +6,6 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Move with a Sprite Animation Example"
 
-COIN_SCALE = 0.5
-COIN_COUNT = 15
 CHARACTER_SCALING = 1
 
 # How fast to move, and how fast to run the animation
@@ -47,7 +45,7 @@ class Sara(arcade.Sprite):
 
         # Adjust the collision box. Default includes too much empty space
         # side-to-side. Box is centered at sprite center, (0, 0)
-        self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
+        # self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
 
         # --- Load Textures ---
 
@@ -100,52 +98,33 @@ class MyGame(arcade.Window):
 
         # Sprite lists
         self.player_list = None
-        self.coin_list = None
 
         # Set up the player
-        self.score = 0
         self.player = None
 
     def setup(self):
         self.player_list = arcade.SpriteList()
-        self.coin_list = arcade.SpriteList()
-
+        
         # Set up the player
-        self.score = 0
         self.player = Sara()
 
         self.player.center_x = SCREEN_WIDTH // 2
         self.player.center_y = SCREEN_HEIGHT // 2
-        # self.player.scale = 0.8 # This seems redundant...
 
         self.player_list.append(self.player)
 
-        for i in range(COIN_COUNT):
-            coin = arcade.Sprite(":resources:images/items/gold_1.png",
-                                 scale=0.5)
-            coin.center_x = random.randrange(SCREEN_WIDTH)
-            coin.center_y = random.randrange(SCREEN_HEIGHT)
-
-            self.coin_list.append(coin)
-
         # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        arcade.set_background_color(arcade.color.DEEP_SKY_BLUE)
 
     def on_draw(self):
         """
         Render the screen.
         """
-
         # This command has to happen before we start drawing
         arcade.start_render()
 
         # Draw all the sprites.
-        self.coin_list.draw()
         self.player_list.draw()
-
-        # Put the text on the screen.
-        output = f"Score: {self.score}"
-        arcade.draw_text(output, 10, 20, arcade.color.WHITE, 14)
 
     def on_key_press(self, key, modifiers):
         """
@@ -177,14 +156,6 @@ class MyGame(arcade.Window):
 
         # Update the players animation
         self.player_list.update_animation()
-
-        # Generate a list of all sprites that collided with the player.
-        hit_list = arcade.check_for_collision_with_list(self.player, self.coin_list)
-
-        # Loop through each colliding sprite, remove it, and add to the score.
-        for coin in hit_list:
-            coin.remove_from_sprite_lists()
-            self.score += 1
 
 
 def main():
