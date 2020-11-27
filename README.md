@@ -5,13 +5,13 @@ HOW TO GET THIS GREEN LIT ON STEAM
 
 ## Misael ==> Tiled Maps (will post maps when done)
 
-## Zack ==> Projectile logic and animation
+## Zack ==> Sword logic and animation/User Interface stuff (NPC's)
 
-## Austin ==> Enemy stats/decisions (inventory and movement)
+## Austin ==> Enemy logic/puzzle logic
 
-## Roberto ==> Changing Screens, when hitting a certain position.
+## Roberto ==> Puzzle and dungeon maps/logic
 
-## Everyone ==> Learn Tiled and GitHub 
+## Everyone ==> Try to
 
 
 
