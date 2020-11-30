@@ -8,10 +8,6 @@ SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 650
 SCREEN_TITLE = "PLATFORMER"
 
-example = projectile.Arrow()
-ARROW_SPEED = example.speed
-RATE_OF_FIRE = example.fire_rate
-BURST_SIZE = example.burst_size
 # MAX_SPREAD = .05  # +/- in degrees
 
 #Constants used to scale our sprites from their original size
@@ -193,19 +189,22 @@ class MyGame(arcade.Window):
         self.projectile_list.update()
         for item in self.projectile_list:
             if len(item.collides_with_list(self.wall_list)) > 0:
-                if example.does_stick:
+                if item.does_stick:
                     item.change_x = 0
                     item.change_y = 0
                 else:
                     item.kill()
+
         if self.firing == True:
-            if self.frame_count > (RATE_OF_FIRE * BURST_SIZE):
+            arrow = projectile.Arrow()
+            if self.frame_count > (arrow.fire_rate * arrow.burst_size):
                 self.firing = False
                 self.frame_count = 0
-            elif self.frame_count % RATE_OF_FIRE == 0:
-                self.shoot(self._mouse_x, self._mouse_y)
+            elif self.frame_count % arrow.fire_rate == 0:
+                self.projectile_list.append(arrow.shoot(player_sprite=self.player_sprite,dest_x=self._mouse_x,dest_y=self._mouse_y))
 
             self.frame_count += 1
+
         #calculate speed based on the keys pressed
         self.player_sprite.change_x = 0
         self.player_sprite.change_y = 0
@@ -299,44 +298,47 @@ class MyGame(arcade.Window):
         if key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = False
 
-    def on_mouse_press(self, x, y, button, modifiers):
+    # def on_mouse_press(self, x, y, button, modifiers):
     # def on_mouse_scroll(self, x, y, button, modifiers):
-    # def on_mouse_motion(self, x, y, button, modifiers):
+    def on_mouse_motion(self, x, y, button, modifiers):
         self.firing = True
         # self.shoot(x,y)
+        # arrow = projectile.Arrow()
+        # self.projectile_list.append(arrow.shoot(player_sprite=self.player_sprite,dest_x=self._mouse_x,dest_y=self._mouse_y))
 
 
-    def shoot(self, dest_x, dest_y, projectile_type='arrow'):
-        if projectile_type == 'arrow':
-            arrow = projectile.Arrow()
-        elif projectile_type == 'burst':
-            pass
 
-        arrow_y = self.player_sprite.center_y
-        arrow_x = self.player_sprite.center_x
-        arrow.position = self.player_sprite.position
+    # def shoot(self, dest_x, dest_y, projectile_type='arrow'):
+    #     if projectile_type == 'arrow':
+    #         arrow = projectile.Arrow()
+    #     elif projectile_type == 'burst':
+    #         pass
 
-        # dest_x = x
-        # dest_y = y
+    #     arrow_y = self.player_sprite.center_y
+    #     arrow_x = self.player_sprite.center_x
+    #     arrow.position = self.player_sprite.position
 
-        x_diff = dest_x - arrow_x
-        y_diff = dest_y - arrow_y
-        angle = math.atan2(y_diff, x_diff)
+    #     # dest_x = (250/SCREEN_WIDTH)
+    #     # dest_y = 250/SCREEN_HEIGHT
 
-        size = max(self.player_sprite.width, self.player_sprite.height) / 2
+    #     x_diff = dest_x - arrow_x
+    #     y_diff = dest_y - arrow_y
+    #     angle = math.atan2(y_diff, x_diff)
 
-        arrow.center_x += size * math.cos(angle)
-        arrow.center_y += size * math.sin(angle)
+    #     size = max(self.player_sprite.width, self.player_sprite.height) / 2
 
-        arrow.change_x = math.cos(angle) * ARROW_SPEED
-        arrow.change_y = math.sin(angle) * ARROW_SPEED
+    #     arrow.center_x += size * math.cos(angle)
+    #     arrow.center_y += size * math.sin(angle)
 
-        arrow.angle = math.degrees(angle) - 90
+    #     arrow.change_x = math.cos(angle) * ARROW_SPEED
+    #     arrow.change_y = math.sin(angle) * ARROW_SPEED
 
-        self.projectile_list.append(arrow)
+    #     arrow.angle = math.degrees(angle) - 90
 
-        # print(f'({x},{y})')
-        # print(f'({arrow_x},{arrow_y})')
+    #     self.projectile_list.append(arrow)
+
+    #     # print(f'({x},{y})')
+    #     # print(f'({arrow_x},{arrow_y})')
 
 
 def main():
