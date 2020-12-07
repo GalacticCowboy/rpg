@@ -1,20 +1,21 @@
 import arcade
 import math
-# import mapTest
+
 
 
 class Projectile(arcade.Sprite):
     '''Generic projectile. Subclasses represent various
     presets, however specific or unique instances can be generated here.'''
 
-    def __init__(self, file, scale=1, angle_adjustment=0, damage=10, speed=10, burst_size=1,fire_rate=2,does_stick=False):
+    def __init__(self, file, scale=1, angle=0, damage=10, speed=10, max_range=400, min_range=10,does_stick=False):
         super().__init__(file,scale)
         self.damage = damage
         self.speed = speed
-        self.burst_size = burst_size
-        self.fire_rate = fire_rate
         self.does_stick = does_stick
-        self.orientation_adjustment = angle_adjustment
+        self.orientation_adjustment = angle
+        self.max_range = max_range
+        self.min_range = min_range
+        self.start_pos = None
     # def update(self):
     #     self.position += self.velocity
         # hit_list = arcade.check_for_collision_with_list(self.sprite, Sprite_lists.wall_list)
@@ -25,18 +26,12 @@ class Projectile(arcade.Sprite):
         #     each.set_hp(self.damage)
 
     def shoot(self, player_sprite, dest_x, dest_y):
-        '''Returns a projectile object ready to be appended to projectile list'''
-        # if projectile_type == 'arrow':
-        #     arrow = Arrow()
-        # elif projectile_type == 'burst':
-        #     pass
 
         projectile_x = player_sprite.center_x
         projectile_y = player_sprite.center_y
         self.position = player_sprite.position
+        self.start_pos = player_sprite.position
 
-        # dest_x = x
-        # dest_y = y
 
         x_diff = dest_x - projectile_x
         y_diff = dest_y - projectile_y
@@ -47,6 +42,7 @@ class Projectile(arcade.Sprite):
         self.center_x += size * math.cos(angle)
         self.center_y += size * math.sin(angle)
 
+
         self.change_x = math.cos(angle) * self.speed
         self.change_y = math.sin(angle) * self.speed
 
@@ -54,10 +50,11 @@ class Projectile(arcade.Sprite):
 
         return self
 
+
 class Arrow(Projectile):
     '''Arrow preset'''
     def __init__(self, damage=25, speed=20):
-        super().__init__('arrow.png',.2, 90,damage,speed,does_stick=True)
+        super().__init__('Sprites/arrow.png',.2, 90,damage,speed,does_stick=True)
         self.orientation_adjustment = 90
 
 

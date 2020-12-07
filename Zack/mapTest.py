@@ -2,6 +2,8 @@ import arcade
 import math
 import random
 import projectile
+import melee
+import os
 
 #Constants
 SCREEN_WIDTH = 1000
@@ -11,20 +13,97 @@ SCREEN_TITLE = "PLATFORMER"
 # MAX_SPREAD = .05  # +/- in degrees
 
 #Constants used to scale our sprites from their original size
-CHARACTER_SCALING = 1
+CHARACTER_SCALING = .6
 TILE_SCALING = 0.5
 COIN_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 16
 GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * TILE_SCALING)
 
 #movement
-PLAYER_MOVEMENT_SPEED = 5
+MOVEMENT_SPEED = 5
+
+# How fast to move, and how fast to run the animation
+MOVEMENT_SPEED = 5
+UPDATES_PER_FRAME = 5
+
+# Constants used to track of Sara direction
+UP_FACING = 0
+LEFT_FACING = 1
+DOWN_FACING = 2
+RIGHT_FACING = 3
 
 #scrolling
 LEFT_VIEWPORT_MARGIN = 50
 RIGHT_VIEWPORT_MARGIN = 50
 BOTTOM_VIEWPORT_MARGIN = 50
 TOP_VIEWPORT_MARGIN = 50
+
+def get_texture(filename, x, y):
+    """
+    Load a texture from the sprite sheet.
+    Up: y = 8, Left: y = 9, Down: y = 10, Right: y = 11.
+    Cycle through x from 0 to 8.
+    """
+    return arcade.load_texture(filename, x * 64, y * 64, width=64, height=64)
+
+class Sara(arcade.Sprite):
+    def __init__(self):
+
+        # Set up parent class
+        super().__init__()
+
+        # Default to face-right
+        self.character_face_direction = UP_FACING
+
+        # Used for flipping between image sequences
+        self.cur_texture = 0
+
+        self.scale = CHARACTER_SCALING
+
+        # Adjust the collision box. Default includes too much empty space
+        # side-to-side. Box is centered at sprite center, (0, 0)
+        # self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
+
+        # --- Load Textures ---
+
+        # Path to Sara sprite sheet
+        self.file_path = os.path.dirname(os.path.abspath(__file__)) + \
+        "\\Sprites\\SaraFullSheet.png"
+
+        # Load textures
+        self.textures = []
+        direction_set = []
+        for y in range(8, 12):
+            direction_set = []
+            for x in range(9):
+                direction_set.append(get_texture(self.file_path, x, y))
+            self.textures.append(direction_set)
+
+    def update_animation(self, delta_time: float = 1/60):
+
+        # Figure out if we need to change direction
+        if self.change_y < 0 and self.character_face_direction != DOWN_FACING:
+            self.character_face_direction = DOWN_FACING
+        elif self.change_y > 0 and self.character_face_direction != UP_FACING:
+            self.character_face_direction = UP_FACING
+        elif self.change_x < 0 and self.character_face_direction != LEFT_FACING:
+            self.character_face_direction = LEFT_FACING
+        elif self.change_x > 0 and self.character_face_direction != RIGHT_FACING:
+            self.character_face_direction = RIGHT_FACING
+
+        # Idle animation
+        # print(self.textures[0][0])
+        if self.change_x == 0 and self.change_y == 0:
+            self.texture = self.textures[2][0]
+            return
+
+        # Walking animation
+        self.cur_texture += 1
+        if self.cur_texture > 8 * UPDATES_PER_FRAME:
+            self.cur_texture = 0
+        frame = self.cur_texture // UPDATES_PER_FRAME
+        direction = self.character_face_direction
+        self.texture = self.textures[direction][frame]
 
 class MyGame(arcade.Window):
 
@@ -36,7 +115,7 @@ class MyGame(arcade.Window):
 
         # These are 'lists' that keep track of our sprites. Each sprite should
         # go into a list.
-        # self.coin_list = None
+        self.pickup_list = None
         self.wall_list = None
         self.player_list = None
         self.background_list = None
@@ -59,7 +138,7 @@ class MyGame(arcade.Window):
         self.view_left = 0
 
         #keep track of the score
-        self.score = 0
+        self.ammo = 0
 
         #load sounds
         # self.collect_coin_sound = arcade.load_sound(":resources:sounds/coin1.wav")
@@ -76,21 +155,24 @@ class MyGame(arcade.Window):
         self.view_left = 0
 
         #Keep track of the score
-        self.score = 0
+        self.ammo = 5
 
         self.player_list = arcade.SpriteList()
         self.background_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList(use_spatial_hash=True)
-        # self.coin_list = arcade.SpriteList(use_spatial_hash=True)
+        self.pickup_list = arcade.SpriteList(use_spatial_hash=True)
         self.projectile_list = arcade.SpriteList()
+        self.charge_list = arcade.SpriteList()
+        self.melee_list = arcade.SpriteList()
 
-        image_source = "Hat_man1.png"
-        self.player_sprite = arcade.Sprite(image_source, CHARACTER_SCALING)
+
+        # image_source = "Sprites/Hat_man1.png"
+        self.player_sprite = Sara()
         self.player_sprite.center_x = 64
         self.player_sprite.center_y = 128
         self.player_list.append(self.player_sprite)
 
-        self.player_sprite.scale = 0.3
+        self.player_sprite.scale = CHARACTER_SCALING
 
 
 
@@ -122,7 +204,7 @@ class MyGame(arcade.Window):
         #     coin = arcade.Sprite(":resources:images/items/coinGold.png", COIN_SCALING)
         #     coin.center_x = x
         #     coin.center_y = 96
-        #     self.coin_list.append(coin)
+        #     self.pickup_list.append(coin)
 
 
         #load in map from the tiled editor
@@ -151,7 +233,7 @@ class MyGame(arcade.Window):
         use_spatial_hash=True)
 
         #coins
-        # self.coin_list = arcade.tilemap.process_layer(my_map, coins_layer_name, scaling=TILE_SCALING, use_spatial_hash=True)
+        # self.pickup_list = arcade.tilemap.process_layer(my_map, coins_layer_name, scaling=TILE_SCALING, use_spatial_hash=True)
 
 
         #otherstuff
@@ -172,64 +254,80 @@ class MyGame(arcade.Window):
         self.wall_list.draw()
         self.background_list.draw()
         self.wall_list.draw()
-        # self.coin_list.draw()
+        self.pickup_list.draw()
         self.player_list.draw()
+        self.melee_list.draw()
 
 
         #Draw our score on the screen, scrolling it with the viewport
-        score_text = f"Score: {self.score}"
-        arcade.draw_text(score_text, 10 + self.view_left, 10 + self.view_bottom,
-        arcade.csscolor.WHITE, 18)
+        score_text = f"Arrows: {self.ammo}"
+        if self.ammo == 0:
+            color = arcade.csscolor.RED
+        else:
+            color = arcade.csscolor.WHITE
+        arcade.draw_text(score_text, 875, 590,
+        color, 18)
 
         self.projectile_list.draw()
 
     def on_update(self, delta_time):
         #move the player with the physics engine
+        self.player_list.update_animation()
         self.physics_engine.update()
         self.projectile_list.update()
         for item in self.projectile_list:
-            if len(item.collides_with_list(self.wall_list)) > 0:
+            if (len(item.collides_with_list(self.wall_list)) > 0) or (arcade.get_distance(item.position[0],item.position[1],item.start_pos[0],item.start_pos[1]) > item.min_range):
                 if item.does_stick:
                     item.change_x = 0
                     item.change_y = 0
+                    self.pickup_list.append(item)
+                    self.projectile_list.remove(item)
                 else:
                     item.kill()
 
-        if self.firing == True:
-            arrow = projectile.Arrow()
-            if self.frame_count > (arrow.fire_rate * arrow.burst_size):
-                self.firing = False
-                self.frame_count = 0
-            elif self.frame_count % arrow.fire_rate == 0:
-                self.projectile_list.append(arrow.shoot(player_sprite=self.player_sprite,dest_x=self._mouse_x,dest_y=self._mouse_y))
+        self.charge_list.update()
+        if len(self.charge_list) == 0:
+            MOVEMENT_SPEED = 5
+        else:
+            MOVEMENT_SPEED = 2
+        for item in self.charge_list:
+            if item.min_range < item.max_range:
+                item.min_range += 10
 
-            self.frame_count += 1
+        self.melee_list.update()
+        for item in self.melee_list:
+            item.center_x += self.player_sprite.change_x
+            item.center_y += self.player_sprite.change_y
+            item.life_span +=1
+            if item.life_span > item.attack_speed:
+                item.kill()
+            if len(arcade.check_for_collision_with_list(item, self.wall_list)) > 0:
+                item.kill()
 
         #calculate speed based on the keys pressed
         self.player_sprite.change_x = 0
         self.player_sprite.change_y = 0
 
         if self.up_pressed and not self.down_pressed:
-            self.player_sprite.change_y = PLAYER_MOVEMENT_SPEED
+            self.player_sprite.change_y = MOVEMENT_SPEED
         elif self.down_pressed and not self.up_pressed:
-            self.player_sprite.change_y = -PLAYER_MOVEMENT_SPEED
+            self.player_sprite.change_y = -MOVEMENT_SPEED
         elif self.left_pressed and not self.right_pressed:
-            self.player_sprite.change_x = -PLAYER_MOVEMENT_SPEED
+            self.player_sprite.change_x = -MOVEMENT_SPEED
         elif self.right_pressed and not self.left_pressed:
-            self.player_sprite.change_x = PLAYER_MOVEMENT_SPEED
+            self.player_sprite.change_x = MOVEMENT_SPEED
 
         #see if we hit any coins
-        # coin_hit_list = arcade.check_for_collision_with_list(self.player_sprite,
-        # self.coin_list)
+        pickup_hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.pickup_list)
 
         #loop through each coin we hit (if any) and remove it
-        # for coin in coin_hit_list:
+        for thing in pickup_hit_list:
         #     #Remove the coin
-        #     coin.remove_from_sprite_lists()
+            thing.remove_from_sprite_lists()
         #     #play a sound
         #     arcade.play_sound(self.collect_coin_sound)
         #     #Add one to the score
-        #     self.score += 1
+            self.ammo += 1
 
 
         #Track if we need to change the viewport
@@ -298,48 +396,29 @@ class MyGame(arcade.Window):
         if key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = False
 
-    # def on_mouse_press(self, x, y, button, modifiers):
+    def on_mouse_press(self, x, y, button, modifiers):
     # def on_mouse_scroll(self, x, y, button, modifiers):
-    def on_mouse_motion(self, x, y, button, modifiers):
-        self.firing = True
-        # self.shoot(x,y)
-        # arrow = projectile.Arrow()
-        # self.projectile_list.append(arrow.shoot(player_sprite=self.player_sprite,dest_x=self._mouse_x,dest_y=self._mouse_y))
+    # def on_mouse_motion(self, x, y, button, modifiers):
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            if len(self.melee_list) == 0:
+                sword = melee.Sword()
+                # if modifiers == arcade.key.MOD_SHIFT:
+                #     self.projectile_list.append(sword.throw(self.player_sprite,self._mouse_x,self._mouse_y))
+                # else:
+                self.melee_list.append(sword.attack(self.player_sprite,self._mouse_x,self._mouse_y))
+
+        elif button == arcade.MOUSE_BUTTON_RIGHT:
+            if self.ammo > 0:
+                arrow = projectile.Arrow()
+                self.charge_list.append(arrow)
+                print(self.view_left,self.view_bottom)
 
 
-
-    # def shoot(self, dest_x, dest_y, projectile_type='arrow'):
-    #     if projectile_type == 'arrow':
-    #         arrow = projectile.Arrow()
-    #     elif projectile_type == 'burst':
-    #         pass
-
-    #     arrow_y = self.player_sprite.center_y
-    #     arrow_x = self.player_sprite.center_x
-    #     arrow.position = self.player_sprite.position
-
-    #     # dest_x = (250/SCREEN_WIDTH)
-    #     # dest_y = 250/SCREEN_HEIGHT
-
-    #     x_diff = dest_x - arrow_x
-    #     y_diff = dest_y - arrow_y
-    #     angle = math.atan2(y_diff, x_diff)
-
-    #     size = max(self.player_sprite.width, self.player_sprite.height) / 2
-
-    #     arrow.center_x += size * math.cos(angle)
-    #     arrow.center_y += size * math.sin(angle)
-
-    #     arrow.change_x = math.cos(angle) * ARROW_SPEED
-    #     arrow.change_y = math.sin(angle) * ARROW_SPEED
-
-    #     arrow.angle = math.degrees(angle) - 90
-
-    #     self.projectile_list.append(arrow)
-
-    #     # print(f'({x},{y})')
-    #     # print(f'({arrow_x},{arrow_y})')
-
+    def on_mouse_release(self,x,y,button,modifiers):
+        if button == arcade.MOUSE_BUTTON_RIGHT:
+            arrow = self.charge_list.pop()
+            self.projectile_list.append(arrow.shoot(self.player_sprite,self._mouse_x,self._mouse_y))
+            self.ammo -= 1
 
 def main():
     window = MyGame()
