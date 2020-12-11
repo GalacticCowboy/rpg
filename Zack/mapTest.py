@@ -3,6 +3,7 @@ import math
 import random
 import projectile
 import melee
+import enemy
 import os
 
 #Constants
@@ -20,7 +21,8 @@ SPRITE_PIXEL_SIZE = 16
 GRID_PIXEL_SIZE = (SPRITE_PIXEL_SIZE * TILE_SCALING)
 
 #movement
-MOVEMENT_SPEED = 5
+MOVEMENT_SPEED = 3
+ENEMY_COUNT = 2
 
 # How fast to move, and how fast to run the animation
 MOVEMENT_SPEED = 5
@@ -54,6 +56,7 @@ class Sara(arcade.Sprite):
 
         # Default to face-right
         self.character_face_direction = UP_FACING
+        self.hp = 100
 
         # Used for flipping between image sequences
         self.cur_texture = 0
@@ -164,8 +167,11 @@ class MyGame(arcade.Window):
         self.projectile_list = arcade.SpriteList()
         self.charge_list = arcade.SpriteList()
         self.melee_list = arcade.SpriteList()
+        self.enemy_list = arcade.SpriteList()
 
-
+        example = enemy.Enemy(720,420)
+        self.enemy_list.append(example)
+        self.barrier_list = arcade.AStarBarrierList(example,self.wall_list,64*CHARACTER_SCALING,30,1000,30,700)
         # image_source = "Sprites/Hat_man1.png"
         self.player_sprite = Sara()
         self.player_sprite.center_x = 64
@@ -173,7 +179,6 @@ class MyGame(arcade.Window):
         self.player_list.append(self.player_sprite)
 
         self.player_sprite.scale = CHARACTER_SCALING
-
 
 
 
@@ -242,6 +247,7 @@ class MyGame(arcade.Window):
 
 
         self.physics_engine = arcade.PhysicsEngineSimple(self.player_sprite, self.wall_list)
+
         #simple for overhead games
 
     def on_draw(self):
@@ -257,7 +263,11 @@ class MyGame(arcade.Window):
         self.pickup_list.draw()
         self.player_list.draw()
         self.melee_list.draw()
+        self.enemy_list.draw()
 
+        for bad_guy in self.enemy_list:
+            if bad_guy.path:
+                arcade.draw_line_strip(bad_guy.path, arcade.color.BLUE, 2)
 
         #Draw our score on the screen, scrolling it with the viewport
         score_text = f"Arrows: {self.ammo}"
@@ -265,34 +275,73 @@ class MyGame(arcade.Window):
             color = arcade.csscolor.RED
         else:
             color = arcade.csscolor.WHITE
-        arcade.draw_text(score_text, 875, 590,
+        arcade.draw_text(score_text, 775, 590,
         color, 18)
+
+        health_text = f"Health: {self.player_sprite.hp}"
+        if self.player_sprite.hp <= 35:
+            color = arcade.csscolor.RED
+        else:
+            color = arcade.csscolor.WHITE
+        arcade.draw_text(health_text, 775, 540,
+        color, 18)
+
+        if len(self.charge_list) > 0:
+            power = self.charge_list[0].power// 10
+        else:
+            power = 0
+        indicator = '-' * power
+        space = ' ' * (10 - power)
+        if power == 10:
+            charge_color = arcade.csscolor.RED
+        else:
+            charge_color = arcade.csscolor.WHITE
+        charge_text = f"Charging: <{indicator}{space}>"
+        arcade.draw_text(charge_text,775, 490,
+        charge_color, 18)
+
 
         self.projectile_list.draw()
 
     def on_update(self, delta_time):
         #move the player with the physics engine
+        self.frame_count += 1
         self.player_list.update_animation()
+        self.enemy_list.update()
         self.physics_engine.update()
         self.projectile_list.update()
+        self.charge_list.update()
+        if len(self.enemy_list) < ENEMY_COUNT:
+            self.enemy_list.append(enemy.Enemy(random.randint(30,500),random.randint(30,500)))
+
         for item in self.projectile_list:
             if (len(item.collides_with_list(self.wall_list)) > 0) or (arcade.get_distance(item.position[0],item.position[1],item.start_pos[0],item.start_pos[1]) > item.min_range):
                 if item.does_stick:
                     item.change_x = 0
                     item.change_y = 0
-                    self.pickup_list.append(item)
-                    self.projectile_list.remove(item)
+                    if random.randint(0,100) < 40:
+                        self.pickup_list.append(item)
+                        self.projectile_list.remove(item)
+                    else:
+                        item.kill()
                 else:
                     item.kill()
+            shot_list = arcade.check_for_collision_with_list(item,self.enemy_list)
+            if arcade.check_for_collision(self.player_sprite,item):
+                shot_list.append(self.player_sprite)
+            for person in shot_list:
+                person.hp -= item.damage
+                item.kill()
 
-        self.charge_list.update()
         if len(self.charge_list) == 0:
             MOVEMENT_SPEED = 5
         else:
             MOVEMENT_SPEED = 2
         for item in self.charge_list:
-            if item.min_range < item.max_range:
-                item.min_range += 10
+            if item.power <= 100:
+                item.power += 3
+            else:
+                item.power = 100
 
         self.melee_list.update()
         for item in self.melee_list:
@@ -303,6 +352,32 @@ class MyGame(arcade.Window):
                 item.kill()
             if len(arcade.check_for_collision_with_list(item, self.wall_list)) > 0:
                 item.kill()
+
+        for bad_guy in self.enemy_list:
+            slap_list = arcade.check_for_collision_with_list(bad_guy, self.melee_list)
+            for item in slap_list:
+                bad_guy.hp -= item.damage
+                # bad_guy.kill()
+                item.damage = 0
+            if bad_guy.hp <= 0:
+                for drop in bad_guy.drop():
+                    self.pickup_list.append(drop)
+                bad_guy.kill()
+            bad_guy.path = arcade.astar_calculate_path(bad_guy.position, self.player_sprite.position,self.barrier_list,False)
+            try:
+                bad_guy.chase(bad_guy.path[0][0],bad_guy.path[0][1])
+            except IndexError:
+                self.player_sprite.hp -= bad_guy.damage
+            except Exception as e:
+                print(e)
+
+            if (self.frame_count) % (bad_guy.fire_rate*60) == 0:
+                bad_guy.has_shot = True
+                if (bad_guy.has_shot == True):
+                    if arcade.has_line_of_sight(self.player_sprite.position,bad_guy.position,self.wall_list,500):
+                        self.projectile_list.append(bad_guy.shoot(self.player_sprite))
+                        bad_guy.has_shot = False
+            # print(bad_guy.path,"->", self.player_sprite.position)
 
         #calculate speed based on the keys pressed
         self.player_sprite.change_x = 0
@@ -330,45 +405,45 @@ class MyGame(arcade.Window):
             self.ammo += 1
 
 
-        #Track if we need to change the viewport
-        changed = False
+        # #Track if we need to change the viewport
+        # changed = False
 
-        #Scroll left
-        left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
-        if self.player_sprite.left < left_boundary:
-            self.view_left -= left_boundary - self.player_sprite.left
-            changed = True
+        # #Scroll left
+        # left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
+        # if self.player_sprite.left < left_boundary:
+        #     self.view_left -= left_boundary - self.player_sprite.left
+        #     changed = True
 
-        #Scroll right
-        right_boundary = self.view_left + 250 - RIGHT_VIEWPORT_MARGIN
-        if self.player_sprite.right > right_boundary:
-            self.view_left += self.player_sprite.right - right_boundary
-            changed = True
+        # #Scroll right
+        # right_boundary = self.view_left + 250 - RIGHT_VIEWPORT_MARGIN
+        # if self.player_sprite.right > right_boundary:
+        #     self.view_left += self.player_sprite.right - right_boundary
+        #     changed = True
 
-        #Scroll UP
-        top_boundary = self.view_bottom + 250 - TOP_VIEWPORT_MARGIN
-        if self.player_sprite.top > top_boundary:
-            self.view_bottom += self.player_sprite.top - top_boundary
-            changed = True
+        # #Scroll UP
+        # top_boundary = self.view_bottom + 250 - TOP_VIEWPORT_MARGIN
+        # if self.player_sprite.top > top_boundary:
+        #     self.view_bottom += self.player_sprite.top - top_boundary
+        #     changed = True
 
-        #Scroll Down
-        bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
-        if self.player_sprite.bottom < bottom_boundary:
-            self.view_bottom -= bottom_boundary - self.player_sprite.bottom
-            changed = True
+        # #Scroll Down
+        # bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
+        # if self.player_sprite.bottom < bottom_boundary:
+        #     self.view_bottom -= bottom_boundary - self.player_sprite.bottom
+        #     changed = True
 
-        changed = False
-        if changed:
-            #Only scroll to integers. OTHERwise we end up with pixels that
-            #dont line up on the screen
-            self.view_bottom = int(self.view_bottom)
-            self.view_left = int(self.view_left)
+        # changed = False
+        # if changed:
+        #     #Only scroll to integers. OTHERwise we end up with pixels that
+        #     #dont line up on the screen
+        #     self.view_bottom = int(self.view_bottom)
+        #     self.view_left = int(self.view_left)
 
-            #do the scrolling
-            arcade.set_viewport(self.view_left,
-            250 + self.view_left,
-            self.view_bottom,
-            250 + self.view_bottom)
+        #     #do the scrolling
+        #     arcade.set_viewport(self.view_left,
+        #     250 + self.view_left,
+        #     self.view_bottom,
+        #     250 + self.view_bottom)
 
 
 
@@ -411,14 +486,15 @@ class MyGame(arcade.Window):
             if self.ammo > 0:
                 arrow = projectile.Arrow()
                 self.charge_list.append(arrow)
-                print(self.view_left,self.view_bottom)
 
 
     def on_mouse_release(self,x,y,button,modifiers):
         if button == arcade.MOUSE_BUTTON_RIGHT:
             arrow = self.charge_list.pop()
+            arrow.min_range = max(int(arrow.max_range * (arrow.power/100)), arrow.min_range)
             self.projectile_list.append(arrow.shoot(self.player_sprite,self._mouse_x,self._mouse_y))
             self.ammo -= 1
+            print(arrow.min_range)
 
 def main():
     window = MyGame()

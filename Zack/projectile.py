@@ -16,6 +16,7 @@ class Projectile(arcade.Sprite):
         self.max_range = max_range
         self.min_range = min_range
         self.start_pos = None
+        self.power = 0
     # def update(self):
     #     self.position += self.velocity
         # hit_list = arcade.check_for_collision_with_list(self.sprite, Sprite_lists.wall_list)
@@ -53,9 +54,11 @@ class Projectile(arcade.Sprite):
 
 class Arrow(Projectile):
     '''Arrow preset'''
-    def __init__(self, damage=25, speed=20):
+    def __init__(self, damage=25, speed=20, position=None):
         super().__init__('Sprites/arrow.png',.2, 90,damage,speed,does_stick=True)
         self.orientation_adjustment = 90
+        if position != None:
+            self.position = position
 
 
 

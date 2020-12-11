@@ -3,7 +3,7 @@ import math
 import projectile
 
 class Melee(arcade.Sprite):
-    def __init__(self, file_name, img_scale=1, damage=10, orientation=0,melee_range=10,speed=10, throw_range=90):
+    def __init__(self, file_name, img_scale=1, damage=70, orientation=0,melee_range=10,speed=20, throw_range=90):
         super().__init__(file_name,img_scale)
         self.file_name = file_name
         self.img_scale = img_scale
@@ -23,7 +23,7 @@ class Melee(arcade.Sprite):
         y_diff = dest_y - weapon_y
         angle = math.atan2(y_diff,x_diff)
 
-        size = max(player_sprite.width, player_sprite.height)/2
+        size = max(player_sprite.width, player_sprite.height)
 
         self.center_x += size * math.cos(angle)
         self.center_y += size * math.sin(angle)
@@ -41,4 +41,4 @@ class Melee(arcade.Sprite):
 
 class Sword(Melee):
     def __init__(self):
-        super().__init__('Sprites/sword_normal.png',img_scale=.7,damage=12, orientation=45,throw_range=50)
+        super().__init__('Sprites/sword_normal.png',img_scale=.9,damage=12, orientation=45,throw_range=50)
