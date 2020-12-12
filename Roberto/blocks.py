@@ -74,3 +74,4 @@
 
         if len(dont_touch_hit_list) > 0:
             pass
+# within the update method
