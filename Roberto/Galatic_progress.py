@@ -354,7 +354,12 @@ class MyGame(arcade.Window):
         self.boss_list.draw()
         self.enemies_shoot_list.draw()
         self.enemies_list.draw()
-        self.player_list.draw()
+        try: 
+            self.player_list.draw()
+        except:
+            pass
+
+
 
     def on_key_press(self, key, modifiers):
         """
@@ -397,12 +402,13 @@ class MyGame(arcade.Window):
         door_hit_list = arcade.check_for_collision_with_list(self.player,
         self.doors_progress_list)
 
-        if door_hit_list:
-            self.map_change = 2
+        if len(door_hit_list) > 0:
+            self.map_change += 1
             self.setup(self.map_change)
             self.view_left = 0
             self.view_bottom = 0
             changed = True
+            
 
         # --- Manage Scrolling ---
 
