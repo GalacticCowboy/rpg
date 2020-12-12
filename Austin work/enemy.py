@@ -1,174 +1,58 @@
 import arcade
 import random
 import os
-
-# Constants
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Moveable Enemy"
-
-# Path to working directory
-MAIN_PATH = os.path.dirname(os.path.abspath(__file__))
-
-# Constants used to scale our sprites from their original size
-ENEMY_SCALING = 1
-TILE_SCALING = 1.9
-
-# Enemy constants (replace later with parameters)
-ENEMY_MOVEMENT_SPEED = 10
-ENEMY_HEALTH = 100
-
-
-PLAYER_START_X = SCREEN_WIDTH / 2
-PLAYER_START_Y = SCREEN_HEIGHT / 2
-
+import projectile
+import melee
 
 class Enemy(arcade.Sprite):
-    def __init__(self):
+    def __init__(self,x,y):
         """Initializer for the enemy."""
-        
-        # Set up parent class
-        super().__init__()
+        super().__init__('resources\\Hat_man1.png',.3)
 
-        # Attributes
-        self.scale = None
-        self.center_x = None
-        self.center_y = None
-        self.texture = None
-        self.health = None
-        self.movement_speed = None
+        self.hp = 50
+        self.drop_list = [1,1,1,2,2,2,2,3,3,4]
+        self.damage = 1
 
-        # Path to enemy sprite sheet
-        self.file_path = MAIN_PATH + "\\resources\images\\rpgcritters2.png"
+        self.center_x = x
+        self.center_y = y
 
-    def setup(self):
-        """Set up the enemy."""
+        self.speed = 1.25
+        self.path = None
 
-        self.scale = ENEMY_SCALING
+        self.fire_rate = 2
+        self.has_shot = True
+    def drop(self):
+        try:
+            drop = self.drop_list[random.randint(0,20)]
+            # drop = self.drop_list[1]
+        except IndexError:
+            drop = 0
 
-        # Set the enemy starting point
-        self.center_x = PLAYER_START_X
-        self.center_y = PLAYER_START_Y
+        drop_list = []
+        for each in range(drop):
+            arrow = projectile.Arrow(position=self.position)
+            drop_list.append(arrow)
 
-        # Load texture 
-        self.texture = arcade.load_texture(self.file_path, x=0, y=0, 
-                                           width=48, height=46)
+        return drop_list
 
-        # Set enemy health
-        self.health = ENEMY_HEALTH
-
-        # Set enemy movement speed
-        self.movement_speed = ENEMY_MOVEMENT_SPEED
-
-
-class MyGame(arcade.Window):
-    """ Main application class. """
-
-    def __init__(self, width, height, title):
-        """ Set up the game and initialize the variables. """
-
-        super().__init__(width, height, title)
-
-        # These are 'lists' that keep track of our sprites. Each sprite should
-        # go into a list.
-        self.wall_list = None
-        self.background_list = None
-        self.enemy_list = None
-
-        # Separate variable that holds the player sprite
-        self.enemy = None
-
-        # Our 'physics' engine
-        self.physics_engine = None
-
-    def setup(self):
-        """ Set up the game here. Call this function to restart the game. """
-
-        # Create the Sprite lists
-        self.wall_list = arcade.SpriteList()
-        self.background_list = arcade.SpriteList()
-        self.enemy_list = arcade.SpriteList()
-
-        # Set up the enemy, specifically placing it at these coordinates.
-        self.enemy = Enemy()
-        self.enemy.setup()
-        self.enemy_list.append(self.enemy)
-
-        # --- Load in a map from the tiled editor ---
-
-        # Layer names
-        walls_layer_name = 'Walls'
-        background_layer_name = "Background"
-        map_name = MAIN_PATH + "\\resources\\tmx_files\enemy_test_map.tmx"
-
-        # Read in the tiled map
-        my_map = arcade.tilemap.read_tmx(map_name)
-
-        # Wall objects
-        self.wall_list = arcade.tilemap.process_layer(my_map,
-                                                      walls_layer_name,
-                                                      scaling=TILE_SCALING,
-                                                      use_spatial_hash=True)
-
-        # Background objects
-        self.background_list = arcade.tilemap.process_layer(my_map, background_layer_name, TILE_SCALING)
-
-        # --- Other stuff
-        # Set the background color
-        if my_map.background_color:
-            arcade.set_background_color(my_map.background_color)
-
-        # Create the 'physics engine'
-        self.physics_engine = arcade.PhysicsEngineSimple(self.enemy, self.wall_list)
-
-
-    def on_draw(self):
+    def chase(self, dest_x, dest_y):
         """
-        Render the screen.
+        This function will move the current sprite towards whatever
+        other sprite is specified as a parameter.
         """
-        # This command has to happen before we start drawing
-        arcade.start_render()
 
-        # Draw our sprites
-        self.wall_list.draw()
-        self.background_list.draw()
-        self.enemy_list.draw()
+        if self.center_y < dest_y:
+            self.center_y += min(self.speed, dest_y - self.center_y)
+        elif self.center_y > dest_y:
+            self.center_y -= min(self.speed, self.center_y - dest_y)
 
-    def on_key_press(self, key, modifiers):
-        """
-        Called whenever a key is pressed.
-        """
-        if key == arcade.key.UP:
-            self.enemy.change_y = self.enemy.movement_speed
-        elif key == arcade.key.DOWN:
-            self.enemy.change_y = -self.enemy.movement_speed
-        elif key == arcade.key.LEFT:
-            self.enemy.change_x = -self.enemy.movement_speed
-        elif key == arcade.key.RIGHT:
-            self.enemy.change_x = self.enemy.movement_speed
+        if self.center_x < dest_x:
+            self.center_x += min(self.speed, dest_x - self.center_x)
+        elif self.center_x > dest_x:
+            self.center_x -= min(self.speed, self.center_x - dest_x)
 
-    def on_key_release(self, key, modifiers):
-        """
-        Called when the user releases a key.
-        """
-        if key == arcade.key.UP or key == arcade.key.DOWN:
-            self.enemy.change_y = 0
-        elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
-            self.enemy.change_x = 0
-
-    def on_update(self, delta_time):
-        """ Movement and game logic """
-
-        # Move the enemy with the physics engine
-        self.physics_engine.update()
-
-
-def main():
-    """ Main method """
-    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    window.setup()
-    arcade.run()
-
-
-if __name__ == "__main__":
-    main()
+    def shoot(self, target_sprite):
+        arrow = projectile.Arrow()
+        arrow.max_range = random.randint(int(arrow.max_range*0.667),arrow.max_range)
+        arrow.min_range = arrow.max_range
+        return arrow.shoot(self, target_sprite.center_x,target_sprite.center_y)

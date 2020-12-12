@@ -2,7 +2,7 @@ import arcade
 import random
 import os
 
-CHARACTER_SCALING = 0.5
+CHARACTER_SCALING = 1.75
 
 # How fast to move, and how fast to run the animation
 MOVEMENT_SPEED = 5
@@ -13,7 +13,6 @@ UP_FACING = 0
 LEFT_FACING = 1
 DOWN_FACING = 2
 RIGHT_FACING = 3
-
 
 PLAYER_START_X = 0
 PLAYER_START_Y = 0
@@ -44,7 +43,10 @@ class Sara(arcade.Sprite):
 
         # Adjust the collision box. Default includes too much empty space
         # side-to-side. Box is centered at sprite center, (0, 0)
-        self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
+        self.points = [[-16, -16], [16, -16], [16, 16], [-16, 16]]
+
+        self.ammo = 5
+        self.hp = 100
 
         # --- Load Textures ---
 
