@@ -1,44 +1,20 @@
-# rpg
-HOW TO GET THIS GREEN LIT ON STEAM 
+a) GALACTIC COWBOY
 
-** - Find documentations
+b) This is a Simple overhead game. The main inspiration for this game derives from classic games like Legend of Zelda.
 
-## Misael ==> Tiled Maps (will post maps when done)
+c) Requirements (
+Python version 3.8.6 or 3.8.9
+Numpy 20.2.4 (WILL NOT WORK WITH 20.3.1) 
+Latest Version of Arcade 
 
-## Zack ==> Sword logic and animation/User Interface stuff (NPC's)
+d) Installation instructions for required libraries (You will copy and paste the following code into your interpreter)
+(Numpy) PIP Install numpy 
+(Python Arcade) PIP Install arcade
 
-## Austin ==> Enemy logic/puzzle logic
+e) How to run the game (command line)
 
-## Roberto ==> Puzzle and dungeon maps/logic
-
-## Everyone ==> Try to
-
-
-
-# Finish Character Animations   *
-
-# Import Tiled Maps   *
-
-# Hit Detection   *
-
-# How do walls Work?
-
-# Put Walls in
-
-# Put Enemies in   *
-
-# UI
-
-# Basic Story
-
-# World Creation
-
-# Weapons
-
-# Music
-
-# Fun
-
-# Sleep
-
- 
+f) Authors
+Roberto Reynosa - rey15020@byui.edu
+Zack Pedersen - ped16009@byui.edu
+Austin Hilderbrand - hil16039@byui.edu
+Misael Payan - m1543l@byui.edu
