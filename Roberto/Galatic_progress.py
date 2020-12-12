@@ -390,19 +390,25 @@ class MyGame(arcade.Window):
         # Update the players animation
         self.player_list.update_animation()
 
+        # for view port
+        changed = False
+
         # see if we touch any doors
         door_hit_list = arcade.check_for_collision_with_list(self.player,
-        self.door_list)
+        self.doors_progress_list)
 
         if door_hit_list:
             self.map_change = 2
             self.setup(self.map_change)
+            self.view_left = 0
+            self.view_bottom = 0
+            changed = True
 
         # --- Manage Scrolling ---
 
         # Track if we need to change the viewport
 
-        changed = False
+        
 
         # Scroll left
         left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
