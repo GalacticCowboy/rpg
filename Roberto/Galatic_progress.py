@@ -49,7 +49,7 @@ class Sara(arcade.Sprite):
 
         # Adjust the collision box. Default includes too much empty space
         # side-to-side. Box is centered at sprite center, (0, 0)
-        # self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
+        self.points = [[-22, -64], [22, -64], [22, 28], [-22, 28]]
 
         # --- Load Textures ---
 
@@ -100,11 +100,65 @@ class MyGame(arcade.Window):
         """ Set up the game and initialize the variables. """
         super().__init__(width, height, title)
 
-        # door list
-        self.door_list = None
+        # door progress list
+        self.doors_progress_list = None
+
+        # door return list
+        self.doors_return_list = None
 
         # wall list
         self.wall_list = None
+
+        # npc list
+        self.npc_list = None
+
+        # boss list
+        self.boss_list = None
+
+        # EnemiesShoot
+        self.enemies_shoot_list = None
+
+        # Enemies
+        self.enemies_list = None
+
+        # locked blocks
+        self.locked_blocks_list = None
+
+        # breakable blocks
+        self.breakable_blocks_list = None
+
+        # Movable blocks
+        self.movable_blocks_list = None
+
+        # switch blocks
+        self.switch_blocks_list = None
+
+        # keys
+        self.keys_list = None
+
+        # hearts
+        self.hearts_list = None
+
+        # switches
+        self.switches_list = None
+
+        # moving platforms horizontal
+        self.moving_plat_horizontal_list = None
+
+        # moving platforms vertical
+        self.moving_plat_vertical_list = None
+
+        # bounce the platforms horizontal
+        self.bounce_moving_plat_horizontal_list = None
+
+        # bounce the platforms vertical
+        self.bounce_moving_plat_vertical_list = None
+
+        # platforms
+        self.platforms_list = None
+
+        # dont touch
+        self.dont_touch_list = None
 
         # back ground list
         self.background_list = None
@@ -140,8 +194,44 @@ class MyGame(arcade.Window):
 
         # layer for the walls
         walls_layer_name = "Walls"
-        # layer for the doors
-        doors_layer_name = "Doors"
+        # layer for the doors to go on
+        doors_progress_layer_name = "DoorsProgress"
+        # layer for the dorrs to return
+        doors_return_layer_name = "DoorsReturn"
+        # layer for the npcs
+        npc_layer_name = "NPC"
+        # layer for moving platforms vertical
+        moving_plat_vertical_layer_name = "MovingPlatformsVertical"
+        # layer for moving platforms horizontal
+        moving_plat_horizontal_layer_name = "MovingPlatformsHorizontal"
+        # layer to change the direction of the vertical platforms
+        bounce_moving_plat_vertical_layer_name = "MovingPlatformsBounceVertical"
+        # layer to change the direction of the horizontal platforms
+        bounce_moving_plat_horizontal_layer_name = "MovingPlatformsBounceHorizontal"
+        # layer for the boss
+        boss_layer_name = "Boss"
+        # layer for enemies shoot
+        enemies_shoot_layer_name = "EnemiesShoot"
+        # layer for enemies
+        enemies_layer_name = "Enemies"
+        # layer for locked blocks
+        locked_blocks_layer_name = "LockedBlocks"
+        # layer for breakable blocks
+        breakable_blocks_layer_name = "BreakableBlocks"
+        # layer for movable blocks
+        movable_blocks_layer_name = "MovableBlocks"
+        # layer for switch blocks
+        switch_blocks_layer_name = "SwitchBlocks"
+        # layer for the platforms
+        platforms_layer_name = "Platforms"
+        # layer for the keys
+        keys_layer_name = "Keys"
+        # layer for the switches
+        switches_layer_name = "Switches"
+        # layer for the hearts
+        hearts_layer_name = "Hearts"
+        #layer for dont touch
+        dont_touch_layer_name = "DontTouch"
         # layer for the background
         background_layer_name = "Background"
 
@@ -161,8 +251,63 @@ class MyGame(arcade.Window):
         scaling=TILE_SCALING,
         use_spatial_hash=True)
 
-        # doors
-        self.door_list = arcade.tilemap.process_layer(my_map, doors_layer_name, TILE_SCALING)
+        # doors progress
+        self.doors_progress_list = arcade.tilemap.process_layer(my_map, doors_progress_layer_name, TILE_SCALING)
+
+        # doors return
+        self.doors_return_list = arcade.tilemap.process_layer(my_map, doors_return_layer_name, TILE_SCALING)
+
+        # npcs
+        self.npc_list = arcade.tilemap.process_layer(my_map, npc_layer_name, TILE_SCALING)
+
+        # boss
+        self.boss_list = arcade.tilemap.process_layer(my_map, boss_layer_name, TILE_SCALING)
+
+        # enemies
+        self.enemies_list = arcade.tilemap.process_layer(my_map, enemies_layer_name, TILE_SCALING)
+
+        # enemies shoot
+        self.enemies_shoot_list = arcade.tilemap.process_layer(my_map, enemies_shoot_layer_name, TILE_SCALING)
+
+        # locked blocks
+        self.locked_blocks_list = arcade.tilemap.process_layer(my_map, locked_blocks_layer_name, TILE_SCALING)
+
+        # breakable blocks
+        self.breakable_blocks_list = arcade.tilemap.process_layer(my_map, breakable_blocks_layer_name, TILE_SCALING)
+
+        # movable blocks
+        self.movable_blocks_list = arcade.tilemap.process_layer(my_map, movable_blocks_layer_name, TILE_SCALING)
+
+        # switch blocks
+        self.switch_blocks_list = arcade.tilemap.process_layer(my_map, switch_blocks_layer_name, TILE_SCALING)
+
+        #keys
+        self.keys_list = arcade.tilemap.process_layer(my_map, keys_layer_name, TILE_SCALING)
+
+        # hearts
+        self.hearts_list = arcade.tilemap.process_layer(my_map, hearts_layer_name, TILE_SCALING)
+
+        # switches
+        self.switches_list = arcade.tilemap.process_layer(my_map, switches_layer_name, TILE_SCALING)
+
+        # bounce the plats horizontal
+        self.bounce_moving_plat_horizontal_list = arcade.tilemap.process_layer(my_map, bounce_moving_plat_horizontal_layer_name, TILE_SCALING)
+
+        # bounce the plats vertical
+        self.bounce_moving_plat_vertical_list = arcade.tilemap.process_layer(my_map, bounce_moving_plat_vertical_layer_name, TILE_SCALING)
+
+        # the plats move horizontal
+        self.moving_plat_horizontal_list = arcade.tilemap.process_layer(my_map, moving_plat_horizontal_layer_name, TILE_SCALING)
+
+        # the plats move vertical
+        self.moving_plat_vertical_list = arcade.tilemap.process_layer(my_map, moving_plat_vertical_layer_name, TILE_SCALING)
+
+        # platforms
+        self.platforms_list = arcade.tilemap.process_layer(my_map, platforms_layer_name, TILE_SCALING)
+
+        # dont touch
+        self.dont_touch_list = arcade.tilemap.process_layer(my_map, dont_touch_layer_name, TILE_SCALING)
+    
 
         #simple for over head games
         self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.wall_list)
@@ -179,7 +324,25 @@ class MyGame(arcade.Window):
         self.wall_list.draw()
         self.background_list.draw()
         self.wall_list.draw()
-        self.door_list.draw()
+        self.doors_progress_list.draw()
+        self.doors_return_list.draw()
+        self.locked_blocks_list.draw()
+        self.breakable_blocks_list.draw()
+        self.movable_blocks_list.draw()
+        self.switch_blocks_list.draw()
+        self.platforms_list.draw()
+        self.bounce_moving_plat_horizontal_list.draw()
+        self.bounce_moving_plat_vertical_list.draw()
+        self.moving_plat_horizontal_list.draw()
+        self.moving_plat_vertical_list.draw()
+        self.keys_list.draw()
+        self.hearts_list.draw()
+        self.switches_list.draw()
+        self.dont_touch_list.draw()
+        self.npc_list.draw()
+        self.boss_list.draw()
+        self.enemies_shoot_list.draw()
+        self.enemies_list.draw()
         self.player_list.draw()
 
     def on_key_press(self, key, modifiers):
