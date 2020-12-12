@@ -28,3 +28,5 @@
         except:
             import traceback
             traceback.print_exc()
+           
+ # within the ondraw method
