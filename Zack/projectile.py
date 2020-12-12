@@ -20,8 +20,8 @@ class Projectile(arcade.Sprite):
 
     def shoot(self, player_sprite, dest_x, dest_y):
 
-        projectile_x = player_sprite.center_x
-        projectile_y = player_sprite.center_y
+        projectile_x = player_sprite.view_position[0]
+        projectile_y = player_sprite.view_position[1]
         self.position = player_sprite.position
         self.start_pos = player_sprite.position
 
@@ -30,7 +30,7 @@ class Projectile(arcade.Sprite):
         y_diff = dest_y - projectile_y
         angle = math.atan2(y_diff, x_diff)
 
-        size = max(player_sprite.width, player_sprite.height) / 2
+        size = max(player_sprite.width, player_sprite.height)
 
         self.center_x += size * math.cos(angle)
         self.center_y += size * math.sin(angle)

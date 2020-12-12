@@ -15,8 +15,8 @@ class Melee(arcade.Sprite):
 
     def attack(self, player_sprite, dest_x, dest_y):
 
-        weapon_x = player_sprite.center_x
-        weapon_y = player_sprite.center_y
+        weapon_x = player_sprite.view_position[0]
+        weapon_y = player_sprite.view_position[1]
         self.position = player_sprite.position
 
         x_diff = dest_x - weapon_x
