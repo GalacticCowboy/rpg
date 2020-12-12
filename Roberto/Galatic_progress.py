@@ -398,16 +398,32 @@ class MyGame(arcade.Window):
         # for view port
         changed = False
 
-        # see if we touch any doors
-        door_hit_list = arcade.check_for_collision_with_list(self.player,
+        # see if we touch any progress doors
+        door_progress_hit_list = arcade.check_for_collision_with_list(self.player,
         self.doors_progress_list)
 
-        if len(door_hit_list) > 0:
+        if len(door_progress_hit_list) > 0:
             self.map_change += 1
             self.setup(self.map_change)
             self.view_left = 0
             self.view_bottom = 0
             changed = True
+
+        # see if we touch any return doors
+        door_return_hit_list = arcade.check_for_collision_with_list(self.player,
+        self.doors_return_list)
+
+        if len(door_return_hit_list) > 0:
+            self.map_change -= 1
+            self.setup(self.map_change)
+            self.view_left = 0
+            self.view_bottom = 0
+            changed = True
+
+
+
+
+        
             
 
         # --- Manage Scrolling ---
