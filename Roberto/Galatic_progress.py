@@ -6,7 +6,7 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 SCREEN_TITLE = "Move with a Sprite Animation Example"
 
-CHARACTER_SCALING = 1
+CHARACTER_SCALING = 0.5
 TILE_SCALING = 0.5
 DOOR_SCALING = 0.5
 
@@ -23,6 +23,13 @@ RIGHT_FACING = 3
 
 PLAYER_START_X = 0
 PLAYER_START_Y = 0
+
+# How many pixels to keep as a minimum margin between the character
+# and the edge of the screen.
+LEFT_VIEWPORT_MARGIN = 250
+RIGHT_VIEWPORT_MARGIN = 250
+BOTTOM_VIEWPORT_MARGIN = 50
+TOP_VIEWPORT_MARGIN = 75
 
 def get_texture(filename, x, y):
     """
@@ -174,6 +181,10 @@ class MyGame(arcade.Window):
 
         # map change
         self.map_change = 1
+
+        # Used to keep track of our scrolling
+        self.view_bottom = 0
+        self.view_left = 0
 
     def setup(self, map_change):
         self.player_list = arcade.SpriteList()
@@ -386,6 +397,48 @@ class MyGame(arcade.Window):
         if door_hit_list:
             self.map_change = 2
             self.setup(self.map_change)
+
+        # --- Manage Scrolling ---
+
+        # Track if we need to change the viewport
+
+        changed = False
+
+        # Scroll left
+        left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
+        if self.player.left < left_boundary:
+            self.view_left -= left_boundary - self.player.left
+            changed = True
+
+        # Scroll right
+        right_boundary = self.view_left + SCREEN_WIDTH - RIGHT_VIEWPORT_MARGIN
+        if self.player.right > right_boundary:
+            self.view_left += self.player.right - right_boundary
+            changed = True
+
+        # Scroll up
+        top_boundary = self.view_bottom + SCREEN_HEIGHT - TOP_VIEWPORT_MARGIN
+        if self.player.top > top_boundary:
+            self.view_bottom += self.player.top - top_boundary
+            changed = True
+
+        # Scroll down
+        bottom_boundary = self.view_bottom + BOTTOM_VIEWPORT_MARGIN
+        if self.player.bottom < bottom_boundary:
+            self.view_bottom -= bottom_boundary - self.player.bottom
+            changed = True
+
+        if changed:
+            # Only scroll to integers. Otherwise we end up with pixels that
+            # don't line up on the screen
+            self.view_bottom = int(self.view_bottom)
+            self.view_left = int(self.view_left)
+
+            # Do the scrolling
+            arcade.set_viewport(self.view_left,
+                                SCREEN_WIDTH + self.view_left,
+                                self.view_bottom,
+                                SCREEN_HEIGHT + self.view_bottom)
 
 
 
