@@ -171,7 +171,7 @@ class MyGame(arcade.Window):
 
         example = enemy.Enemy(720,420)
         self.enemy_list.append(example)
-        self.barrier_list = arcade.AStarBarrierList(example,self.wall_list,64*CHARACTER_SCALING,30,1000,30,700)
+        # self.barrier_list = arcade.AStarBarrierList(example,self.wall_list,64*CHARACTER_SCALING,30,1000,30,700)
         # image_source = "Sprites/Hat_man1.png"
         self.player_sprite = Sara()
         self.player_sprite.center_x = 64
@@ -363,13 +363,21 @@ class MyGame(arcade.Window):
                 for drop in bad_guy.drop():
                     self.pickup_list.append(drop)
                 bad_guy.kill()
-            bad_guy.path = arcade.astar_calculate_path(bad_guy.position, self.player_sprite.position,self.barrier_list,False)
+            # bad_guy.path = arcade.astar_calculate_path(bad_guy.position, self.player_sprite.position,self.barrier_list,False)
             try:
-                bad_guy.chase(bad_guy.path[0][0],bad_guy.path[0][1])
+                bad_guy.chase(self.player_sprite.center_x,self.player_sprite.center_y)
             except IndexError:
                 self.player_sprite.hp -= bad_guy.damage
             except Exception as e:
                 print(e)
+            if arcade.check_for_collision(bad_guy,self.player_sprite):
+                self.player_sprite.hp -= bad_guy.damage
+                self.player_sprite.center_x += (self.player_sprite.center_x-bad_guy.center_x)
+                self.player_sprite.center_y += (self.player_sprite.center_y-bad_guy.center_y)
+            bump_list = arcade.check_for_collision_with_list(bad_guy, self.wall_list)
+            if len(bump_list) > 0:
+                bad_guy.center_x += (bad_guy.center_x-bump_list[0].center_x)
+                bad_guy.center_y += (bad_guy.center_y-bump_list[0].center_y)
 
             if (self.frame_count) % (bad_guy.fire_rate*60) == 0:
                 bad_guy.has_shot = True
