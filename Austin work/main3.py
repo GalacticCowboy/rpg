@@ -388,6 +388,17 @@ class MyGame(arcade.Window):
                     self.pickup_list.append(drop)
                 arcade.play_sound(self.angry_peanut_death_sound)
                 bad_guy.kill()
+                 # opening the last door
+                if len(self.enemies_list) <= 0:
+                    for y in self.locked_blocks_list:
+                        y.kill()
+                    for y in self.locked_blocks_list:
+                        y.kill()
+                    for y in self.locked_blocks_list:
+                        y.kill()
+                    for y in self.locked_blocks_list:
+                        y.kill()
+                
             # bad_guy.path = arcade.astar_calculate_path(bad_guy.position, self.player.position,self.barrier_list,False)
             bad_guy.chase(self.player.center_x,self.player.center_y)
             if arcade.check_for_collision(bad_guy,self.player):
