@@ -58,6 +58,7 @@
         if len(heart_hit_list) > 0:
             for x in heart_hit_list:
                 x.kill()
+                self.player.hp += 10
 
         # breakable blocks
         
