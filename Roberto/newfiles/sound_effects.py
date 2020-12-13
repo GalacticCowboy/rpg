@@ -9,6 +9,7 @@ self.damage_taken_player_sound = arcade.load_sound("music/damage_taken_player_so
 self.damage_taken_enemy_sound = arcade.load_sound("music/damage_taken_enemy_sound.mp3")
 self.door_key_sound = arcade.load_sound("music/door_key_sound.wav")
 self.wall_break_sound = arcade.load_sound("music/wall_break_sound.wav")
+self.background_sound = arcade.load_sound("music/background_music.mp3")
 
 
         
@@ -22,5 +23,7 @@ arcade.play_sound(self.player_death_sound)
 arcade.play_sound(self.damage_taken_enemy_sound)
 arcade.play_sound(self.door_key_sound)
 arcade.play_sound(self.wall_break_sound)
+arcade.play_sound(self.background_sound)
+
 
 
