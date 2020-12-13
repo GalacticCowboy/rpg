@@ -6,6 +6,8 @@ self.angry_peanut_death_sound = arcade.load_sound("music/angry_peanut_death_soun
 self.boss_death_sound = arcade.load_sound("music/boss_death_sound.wav")
 self.damage_taken_player_sound = arcade.load_sound("music/damage_taken_player_sound.mp3")
 self.damage_taken_enemy_sound = arcade.load_sound("music/damage_taken_enemy_sound.mp3")
+self.door_key_sound = arcade.load_sound("music/door_key_sound.wav")
+
         
 # play sounds
 arcade.play_sound(self.sword_sound)
@@ -14,5 +16,6 @@ arcade.play_sound(self.switch_sound)
 arcade.play_sound(self.angry_peanut_death_sound)
 arcade.play_sound(self.boss_death_sound)
 arcade.play_sound(self.damage_taken_enemy_sound)
+arcade.play_sound(self.door_key_sound)
 
 
