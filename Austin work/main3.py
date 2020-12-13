@@ -389,7 +389,7 @@ class MyGame(arcade.Window):
                 arcade.play_sound(self.angry_peanut_death_sound)
                 bad_guy.kill()
                  # opening the last door
-                if len(self.enemies_list) <= 0:
+                if len(self.enemies_list) <= 0 and self.map_change == 5:
                     for y in self.locked_blocks_list:
                         y.kill()
                     for y in self.locked_blocks_list:
