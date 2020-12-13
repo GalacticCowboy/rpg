@@ -73,5 +73,5 @@
         self.dont_touch_list)
 
         if len(dont_touch_hit_list) > 0:
-            pass
+            self.setup(self.map_change)
 # within the update method
