@@ -24,8 +24,9 @@ class Sara(arcade.Sprite):
         # Default to face-right
         self.character_face_direction = UP_FACING
         self.hp = 100
-        self.ammo = 0
+        self.ammo = 20
         self.view_position = self.position
+        self.speed = 5
 
         # Used for flipping between image sequences
         self.cur_texture = 0
