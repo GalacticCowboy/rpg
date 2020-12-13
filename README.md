@@ -14,7 +14,7 @@ d) Installation instructions for required libraries (You will copy and paste the
 e) How to run the game (command line)
 
 f) Authors
-Roberto Reynosa - rey15020@byui.edu
+Roberto Reynoso - rey15020@byui.edu
 Zack Pedersen - ped16009@byui.edu
 Austin Hilderbrand - hil16039@byui.edu
 Misael Payan - m1543l@byui.edu
