@@ -6,7 +6,7 @@ from sara import Sara
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Move with a Sprite Animation Example"
+SCREEN_TITLE = "Galactic Cowboy"
 
 CHARACTER_SCALING = 0.5
 TILE_SCALING = 0.5
@@ -26,7 +26,7 @@ PLAYER_START_X = 0
 PLAYER_START_Y = 0
 
 # How many pixels to keep as a minimum margin between the character
-# and the edge of the screen.
+#     and the edge of the screen.
 LEFT_VIEWPORT_MARGIN = 250
 RIGHT_VIEWPORT_MARGIN = 250
 BOTTOM_VIEWPORT_MARGIN = 50
@@ -118,6 +118,9 @@ class MyGame(arcade.Window):
         # Set up the player
         self.player = None
 
+        # Set up the enemy
+        self.enemy = None
+
         # physics engine
         self.physics_engine = None
 
@@ -129,10 +132,12 @@ class MyGame(arcade.Window):
         self.view_left = 0
 
     def setup(self, map_change):
+        # Set up the lists
         self.player_list = arcade.SpriteList()
         self.background_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList(use_spatial_hash=True)
         self.door_list = arcade.SpriteList(use_spatial_hash=True)
+        self.enemies_list = arcade.SpriteList()
         
         # Set up the player
         self.player = Sara()
@@ -141,6 +146,11 @@ class MyGame(arcade.Window):
         self.player.center_y = PLAYER_START_Y
 
         self.player_list.append(self.player)
+
+        # Set up the enemy
+        self.enemy = Enemy()
+        self.enemy.setup()
+        self.enemies_list.append(self.enemy)
 
         # Set the background color
         arcade.set_background_color(arcade.color.DEEP_SKY_BLUE)
@@ -352,11 +362,20 @@ class MyGame(arcade.Window):
             self.view_bottom = 0
             changed = True
 
+        # see if we touch any return doors
+        door_return_hit_list = arcade.check_for_collision_with_list(self.player,
+        self.doors_return_list)
+
+        if len(door_return_hit_list) > 0:
+            self.map_change -= 1
+            self.setup(self.map_change)
+            self.view_left = 0
+            self.view_bottom = 0
+            changed = True
+
         # --- Manage Scrolling ---
 
         # Track if we need to change the viewport
-
-        
 
         # Scroll left
         left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN

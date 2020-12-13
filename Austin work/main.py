@@ -12,7 +12,7 @@ SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
 SCREEN_TITLE = "Galactic Cowboy"
 
-CHARACTER_SCALING = 2
+CHARACTER_SCALING = 1
 TILE_SCALING = 1.75
 DOOR_SCALING = 0.5
 SPRITE_PIXEL_SIZE = 16
@@ -28,8 +28,8 @@ LEFT_FACING = 1
 DOWN_FACING = 2
 RIGHT_FACING = 3
 
-PLAYER_START_X = 250
-PLAYER_START_Y = 250
+PLAYER_START_X = 700
+PLAYER_START_Y = 75
 
 # How many pixels to keep as a minimum margin between the character
 # and the edge of the screen.
@@ -78,7 +78,7 @@ class MyGame(arcade.Window):
         self.frame_count = 0
 
         # map change
-        self.map_change = 1
+        self.map_change = 2
 
         # Used to keep track of our scrolling
         self.view_bottom = 100
@@ -158,11 +158,24 @@ class MyGame(arcade.Window):
         self.bounce_moving_plat_vertical_list = arcade.tilemap.process_layer(my_map, bounce_moving_plat_vertical_layer_name, TILE_SCALING)
         self.moving_plat_horizontal_list = arcade.tilemap.process_layer(my_map, moving_plat_horizontal_layer_name, TILE_SCALING)
         self.moving_plat_vertical_list = arcade.tilemap.process_layer(my_map, moving_plat_vertical_layer_name, TILE_SCALING)
+        # # Append moving platforms to walls list.
+        # for sprite in self.moving_plat_vertical_list:
+        #     self.background_list.append(sprite)
         self.platforms_list = arcade.tilemap.process_layer(my_map, platforms_layer_name, TILE_SCALING)
         self.dont_touch_list = arcade.tilemap.process_layer(my_map, dont_touch_layer_name, TILE_SCALING)
         self.pickup_list = arcade.SpriteList()
         self.charge_list = arcade.SpriteList()
         self.melee_list = arcade.SpriteList()
+
+        # Adding the other block sprites to the wall list
+        for x in self.switch_blocks_list:
+            self.wall_list.append(x)
+        
+        for x in self.breakable_blocks_list:
+            self.wall_list.append(x)
+
+        for x in self.locked_blocks_list:
+            self.wall_list.append(x)
 
         # Set the background color
         if my_map.background_color:
@@ -170,6 +183,14 @@ class MyGame(arcade.Window):
 
         # simple for over head games
         self.physics_engine = arcade.PhysicsEngineSimple(self.player, self.wall_list)
+
+        # Controls enemy spawning
+        spawns = enemy.get_enemy_spawns(self.map_change)
+        if spawns != None:
+            for each in spawns:
+                self.enemies_list.append(enemy.Enemy(spawns[0],spawns[1]))
+        if self.map_change == 5:
+            self.enemies_list.append(enemy.Boss(800,700))
 
     def on_draw(self):
         """
@@ -181,6 +202,8 @@ class MyGame(arcade.Window):
         # Draw all the sprites.
         self.wall_list.draw()
         self.background_list.draw()
+        self.dont_touch_list.draw()
+        self.platforms_list.draw()
         self.wall_list.draw()
         self.doors_progress_list.draw()
         self.doors_return_list.draw()
@@ -188,7 +211,6 @@ class MyGame(arcade.Window):
         self.breakable_blocks_list.draw()
         self.movable_blocks_list.draw()
         self.switch_blocks_list.draw()
-        self.platforms_list.draw()
         self.bounce_moving_plat_horizontal_list.draw()
         self.bounce_moving_plat_vertical_list.draw()
         self.moving_plat_horizontal_list.draw()
@@ -196,7 +218,6 @@ class MyGame(arcade.Window):
         self.keys_list.draw()
         self.hearts_list.draw()
         self.switches_list.draw()
-        self.dont_touch_list.draw()
         self.npc_list.draw()
         self.boss_list.draw()
         self.enemies_shoot_list.draw()
@@ -234,55 +255,47 @@ class MyGame(arcade.Window):
         """
         Called whenever a key is pressed.
         """
-        if key == arcade.key.UP:
+        if key == arcade.key.UP or key == arcade.key.W:
             self.player.change_y = MOVEMENT_SPEED
-        elif key == arcade.key.DOWN:
+        elif key == arcade.key.DOWN or key == arcade.key.S:
             self.player.change_y = -MOVEMENT_SPEED
-        elif key == arcade.key.LEFT:
+        elif key == arcade.key.LEFT or key == arcade.key.A:
             self.player.change_x = -MOVEMENT_SPEED
-        elif key == arcade.key.RIGHT:
+        elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.player.change_x = MOVEMENT_SPEED
 
     def on_key_release(self, key, modifiers):
         """
         Called when the user releases a key.
         """
-        if key == arcade.key.UP or key == arcade.key.DOWN:
+        if key == arcade.key.UP or \
+           key == arcade.key.W or \
+           key == arcade.key.DOWN or \
+           key == arcade.key.S:
             self.player.change_y = 0
-        elif key == arcade.key.LEFT or key == arcade.key.RIGHT:
+        elif key == arcade.key.RIGHT or \
+             key == arcade.key.D or \
+             key == arcade.key.LEFT or \
+             key == arcade.key.A:
             self.player.change_x = 0
 
     def on_update(self, delta_time):
         """ Movement and game logic """
 
         # move the player with the physics engine
-        try:
-            self.physics_engine.update()
-        except:
-            traceback.print_exc()
+        self.physics_engine.update()
 
         # Move the player
         self.player_list.update()
+
+        # Update walls, used with moving platforms
+        self.moving_plat_vertical_list.update()
 
         # Update the players animation
         self.player_list.update_animation()
 
         # for view port
         changed = False
-
-        # see if we touch any doors
-        door_hit_list = arcade.check_for_collision_with_list(self.player,
-        self.doors_progress_list)
-
-        if len(door_hit_list) > 0:
-            if self.map_change < 5:
-                self.map_change += 1
-            else:
-                self.map_change = 1
-            self.setup(self.map_change)
-            self.view_left = 0
-            self.view_bottom = 0
-            changed = True
 
         # --- Manage Scrolling ---
 
@@ -328,11 +341,6 @@ class MyGame(arcade.Window):
             item.life_span +=1
             if item.life_span > item.attack_speed:
                 item.kill()
-            try:
-                if len(arcade.check_for_collision_with_list(item, self.wall_list)) > 0:
-                    item.kill()
-            except: 
-                pass
 
         for bad_guy in self.enemies_list:
             slap_list = arcade.check_for_collision_with_list(bad_guy, self.melee_list)
@@ -355,19 +363,32 @@ class MyGame(arcade.Window):
                 bad_guy.center_x += (bad_guy.center_x-bump_list[0].center_x)
                 bad_guy.center_y += (bad_guy.center_y-bump_list[0].center_y)
 
+            self.frame_count += 1
             if (self.frame_count) % (bad_guy.fire_rate*60) == 0:
-                bad_guy.has_shot = True
-                if (bad_guy.has_shot == True):
-                    if arcade.has_line_of_sight(self.player.position,bad_guy.position,self.wall_list,500):
-                        self.enemies_shoot_list.append(bad_guy.shoot(self.player))
-                        bad_guy.has_shot = False
-            # print(bad_guy.path,"->", self.player.position)
+                if bad_guy.type == 'pion':
+                    bad_guy.has_shot = True
+                    if (bad_guy.has_shot == True):
+                        if arcade.has_line_of_sight(self.player.position,bad_guy.position,self.wall_list,500):
+                            self.enemies_shoot_list.append(bad_guy.shoot(self.player))
+                            bad_guy.has_shot = False
+                elif bad_guy.type == 'boss':
+                    self.enemies_list.append(bad_guy.spawn())
 
         pickup_hit_list = arcade.check_for_collision_with_list(self.player, self.pickup_list)
 
         for thing in pickup_hit_list:
             thing.kill()
             self.player.ammo += 1
+
+        # --- Logic for moving platforms ---
+        for sprite in self.moving_plat_vertical_list:
+
+            if sprite.boundary_top and sprite.top > sprite.boundary_top and sprite.change_y > 0:
+                sprite.change_y *= -1
+            if sprite.boundary_bottom and sprite.bottom < sprite.boundary_bottom and sprite.change_y < 0:
+                sprite.change_y *= -1
+
+        # --- Manage Scrolling ---
 
         # Scroll left
         left_boundary = self.view_left + LEFT_VIEWPORT_MARGIN
@@ -405,11 +426,103 @@ class MyGame(arcade.Window):
                                 self.view_bottom,
                                 SCREEN_HEIGHT + self.view_bottom)
 
+        for sprite in self.moving_plat_vertical_list:
+            if arcade.check_for_collision(self.player, sprite) and \
+            self.player.change_y == 0:
+                self.player.center_y = sprite.center_y
+            
+        # see if we touch any doors
+        door_progress_hit_list = arcade.check_for_collision_with_list(self.player,
+        self.doors_progress_list)
+
+        if len(door_progress_hit_list) > 0:
+            if self.map_change < 5:
+                self.map_change += 1
+            else:
+                self.map_change = 1
+            self.setup(self.map_change)
+            self.view_left = 0
+            self.view_bottom = 0
+            changed = True
+
+        # see if we touch any return doors
+        door_return_hit_list = arcade.check_for_collision_with_list(self.player,
+        self.doors_return_list)
+
+        if len(door_return_hit_list) > 0:
+            self.map_change -= 1
+            self.setup(self.map_change)
+            self.view_left = 0
+            self.view_bottom = 0
+            changed = True
+
+        # switches
+        switch_hit_list = arcade.check_for_collision_with_list(self.player,
+        self.switches_list)
+
+        if len(switch_hit_list) > 0:
+            for x in self.switch_blocks_list:
+                x.remove_from_sprite_lists()
+                
+        
+        # keys and locked doors
+        key_hit_list = arcade.check_for_collision_with_list(self.player,
+        self.keys_list)
+
+        if len(key_hit_list) > 0:
+            for x in key_hit_list:
+                x.kill()
+                if len(self.locked_blocks_list) > 0:
+                    for y in self.locked_blocks_list:
+                        y.kill()
+                    for y in self.locked_blocks_list:
+                        y.kill()
+                    for y in self.locked_blocks_list:
+                        y.kill()
+                    for y in self.locked_blocks_list:
+                        y.kill()
+
+        # hearts
+        heart_hit_list = arcade.check_for_collision_with_list(self.player,
+        self.hearts_list)
+
+        if len(heart_hit_list) > 0:
+            for x in heart_hit_list:
+                x.kill()
+                self.player.hp += 10
+
+        # breakable blocks
+        # for block in self.breakable_blocks_list:
+            # breakable_blocks_hit_list = arcade.check_for_collision_with_list(block,
+            # self.melee_list)
+            
+            # for broken_block in breakable_blocks_hit_list:
+            #     broken_block.kill()
+        for y in self.breakable_blocks_list:
+            breakable_blocks_hit_list = arcade.check_for_collision_with_list(y,
+            self.melee_list)
+        
+            if len(breakable_blocks_hit_list):
+                y.kill()
+
+
+        # dont touch
+        dont_touch_hit_list = arcade.check_for_collision_with_list(self.player,
+        self.dont_touch_list)
+
+        if len(dont_touch_hit_list) > 0 and \
+        len(arcade.check_for_collision_with_list(self.player, self.moving_plat_vertical_list)) <= 0:
+            self.setup(self.map_change)
+
+        # Aiming
+        self.player.view_position = [(self.player.center_x - self.view_left),(self.player.center_y-self.view_bottom)]
+        
+
     def on_mouse_press(self, x, y, button, modifiers):
         if button == arcade.MOUSE_BUTTON_LEFT:
             if len(self.melee_list) == 0:
                 sword = melee.Sword()
-                self.melee_list.append(sword.attack(self.player,self._mouse_x * TILE_SCALING, self._mouse_y * TILE_SCALING))
+                self.melee_list.append(sword.attack(self.player,self._mouse_x, self._mouse_y))
 
         elif button == arcade.MOUSE_BUTTON_RIGHT:
             if self.player.ammo > 0:

@@ -6,7 +6,7 @@ import os
 PATH = os.path.dirname(os.path.abspath(__file__))
 
 class Melee(arcade.Sprite):
-    def __init__(self, file_name, img_scale=1, damage=70, orientation=0,melee_range=10,speed=20, throw_range=90):
+    def __init__(self, file_name, img_scale=1, damage=75, orientation=0,melee_range=10,speed=20, throw_range=90):
         super().__init__(file_name,img_scale)
         self.file_name = file_name
         self.img_scale = img_scale
@@ -18,8 +18,8 @@ class Melee(arcade.Sprite):
 
     def attack(self, player_sprite, dest_x, dest_y):
 
-        weapon_x = player_sprite.center_x
-        weapon_y = player_sprite.center_y
+        weapon_x = player_sprite.view_position[0]
+        weapon_y = player_sprite.view_position[1]
         self.position = player_sprite.position
 
         x_diff = dest_x - weapon_x
@@ -44,4 +44,4 @@ class Melee(arcade.Sprite):
 
 class Sword(Melee):
     def __init__(self):
-        super().__init__(PATH + '/resources/sword_normal.png',img_scale=.9,damage=12, orientation=45,throw_range=50)
+        super().__init__(PATH+'/resources/sword_normal.png',img_scale=.9,damage=12, orientation=45,throw_range=50)

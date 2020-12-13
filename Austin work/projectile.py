@@ -18,20 +18,12 @@ class Projectile(arcade.Sprite):
         self.min_range = min_range
         self.start_pos = None
         self.power = 0
-    # def update(self):
-    #     self.position += self.velocity
-        # hit_list = arcade.check_for_collision_with_list(self.sprite, Sprite_lists.wall_list)
-        # if len(hit_list) != 0:
-        #     self.kill()
-        # kill the object
-        # for each in hit_list:
-        #     each.set_hp(self.damage)
 
     def shoot(self, player_sprite, dest_x, dest_y):
 
-        projectile_x = player_sprite.center_x
-        projectile_y = player_sprite.center_y
-        self.position = player_sprite.position 
+        projectile_x = player_sprite.view_position[0]
+        projectile_y = player_sprite.view_position[1]
+        self.position = player_sprite.position
         self.start_pos = player_sprite.position
 
 
@@ -39,7 +31,7 @@ class Projectile(arcade.Sprite):
         y_diff = dest_y - projectile_y
         angle = math.atan2(y_diff, x_diff)
 
-        size = max(player_sprite.width, player_sprite.height) 
+        size = max(player_sprite.width, player_sprite.height)
 
         self.center_x += size * math.cos(angle)
         self.center_y += size * math.sin(angle)
@@ -56,15 +48,7 @@ class Projectile(arcade.Sprite):
 class Arrow(Projectile):
     '''Arrow preset'''
     def __init__(self, damage=25, speed=20, position=None):
-        super().__init__(PATH + '/resources/arrow.png',.2, 90,damage,speed,does_stick=True)
+        super().__init__(PATH+'/resources/arrow.png',.2, 90,damage,speed,does_stick=True)
         self.orientation_adjustment = 90
         if position != None:
             self.position = position
-
-
-
-# class Laser(Projectile):
-#     def __init__(self, damage = 30, speed = 30):
-#         super.__init__()
-#         self.damage = damage
-#         self.speed = speed
