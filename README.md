@@ -11,9 +11,20 @@ d) Installation instructions for required libraries (You will copy and paste the
 (Numpy) PIP Install numpy 
 (Python Arcade) PIP Install arcade
 
+"""
+You are going to have to go to the Galactic Cowboy Game folder, and are going to have to download each file, make sure to download each file keeping
+the names of each specific folder, so that the game can read the files correctly and run. so if you cant just download the folders directly from git hub
+you will have to make folders with the same name and place the files for each fold accordingly, so that you can run it within Visual Studio. 
+"""
+
 e) How to run the game (command line)
 
-f) Authors
+f) How to play
+you move with the arrow keys or by using WSAD keys, and attack with the sword by clicking the left mouse key
+(you aim the direction of the sword using the cursor) You can also shoot arrows! by clicking the right mouse key and if you 
+hold the right mouse key, you can launch arrows even further. (you aim with the cursor just like the sword).
+
+g) Authors
 Roberto Reynoso - rey15020@byui.edu
 Zack Pedersen - ped16009@byui.edu
 Austin Hilderbrand - hil16039@byui.edu
