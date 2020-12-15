@@ -11,6 +11,9 @@ you will have to make folders with the same name and place the files for each fo
 
 e) How to run the game (command line)
 
-
+f) How to play
+you move with the arrow keys or by using WSAD keys, and attack with the sword by clicking the left mouse key
+(you aim the direction of the sword using the cursor) You can also shoot arrows! by clicking the right mouse key and if you 
+hold the right mouse key, you can launch arrows even further. (you aim with the cursor just like the sword).
 
 g) Authors Roberto Reynoso - rey15020@byui.edu Zack Pedersen - ped16009@byui.edu Austin Hilderbrand - hil16039@byui.edu Misael Payan - m1543l@byui.ed
